@@ -54,6 +54,6 @@ Camera::Camera(glm::vec3 cameraPos, glm::vec3 cameraFront, glm::vec3 cameraTarge
     this->sensitivity=sensitivity;
     this->yaw = 0;
     this->pitch = 0;
-    this->lastX = 400;
-    this->lastY = 300;
+    this->lastX = 0;
+    this->lastY = 0;
 }

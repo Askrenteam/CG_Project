@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "TextureStore.h"
 
 Model::Model()
 {
@@ -98,8 +99,8 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
     mat.specular = convertToVec3(specular);
     mat.shininess = shininess;
 
-
-    return Mesh(vertices, indices, mat);
+    Texture tex = {TextureStore::instance()->getTexture("cross")};
+    return Mesh(vertices, indices, mat,tex);
 }
 
 mat4 Model::convertToMat4(aiMatrix4x4 matrix) {

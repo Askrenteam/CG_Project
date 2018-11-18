@@ -2,16 +2,19 @@
 
 in vec3 vertex_position;
 in vec3 vertex_normal;
+in vec2 vertex_texCoords;
 
 
 //out vec3 LightIntensity;
 out vec3 fragPos;
 out vec3 normal;
+out vec2 texCoord;
 
 //vec4 LightPosition = vec4 (10.0, 10.0, 4.0, 1.0); // Light position in world coords.
 vec3 Kd = vec3 (1.0, 1.0, 1.0); // white diffuse surface reflectance
 //vec3 Kd = vec3 (0.5, 0.5, 0.5); // white diffuse surface reflectance
 vec3 Ld = vec3 (1.0, 1.0, 1.0); // Light source intensity
+
 
 
 uniform mat4 view;
@@ -26,6 +29,7 @@ void main(){
 
   fragPos = vec3(model * vec4(vertex_position, 1.0));
   normal = t_i_model * vertex_normal;
+  texCoord = vertex_texCoords;
   // Convert normal and position to eye coords
   // Normal in view space
 //  vec3 tnorm = normalize( NormalMatrix * vertex_normal);

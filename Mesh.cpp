@@ -1,14 +1,13 @@
 #include "Mesh.h"
 
-Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material) {
+Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material, Texture text) {
     this->vertices = vertices;
     this->indices = indices;
-//    this->textures = textures;
+    this->textures.push_back(text);
     this->localModel = glm::mat4(1.0f);
     this->material = material;
-//    this->node = node;
+
     setupMesh();
-//    setupMaterial();
 }
 
 void Mesh::setupMesh() {
@@ -38,18 +37,10 @@ void Mesh::setupMesh() {
     glBindVertexArray(0);
 }
 
-void Mesh::setupMaterial()
-{
-    // Chrome values taken from http://devernay.free.fr/cours/opengl/materials.html
-//    this->material.ambient = glm::vec3(0.25, 0.25, 0.25);
-    this->material.ambient = glm::vec3(1.0,1.0,1.0);
-    this->material.diffuse = glm::vec3(0.4, 0.4, 0.4);
-    this->material.specular = glm::vec3(0.774597, 0.774597, 0.774597);
-    this->material.shininess = (float)0.6 * 128;
-}
 
 void Mesh::Draw(glm::mat4 globalModel, Shader shader) {
     globalModel = globalModel * this->localModel;
+    glBindTexture(GL_TEXTURE_2D, textures.at(0).id);
     glBindVertexArray(VAO);
     shader.setUniformMat4("model", globalModel);
     shader.setUniformMat3("t_i_model", glm::mat3(glm::transpose(glm::inverse(globalModel))));

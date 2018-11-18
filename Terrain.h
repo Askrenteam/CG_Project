@@ -6,11 +6,18 @@
 
 class Terrain {
 public:
-    Model model;
-    Terrain(int iterations, float alpha, double maxHeight);
-
+    Model terrain;
+    Model grass;
+    Terrain(int iterations, float alpha, double resSize, double maxHeight);
+    void Draw (Shader shader);
 private:
-    Mesh generateTerrain(int iterations, double alpha, double maxHeight);
+    Mesh generateTerrain(int iterations, double alpha, double resSize, double maxHeight);
+    Mesh generateWater(double size, double waterLevel);
+    void plantGrassAt(vec3 position);
+    void createGrassMesh();
+
+    vector<Vertex> grassVerts;
+    vector<unsigned int> grassIndices;
 };
 
 

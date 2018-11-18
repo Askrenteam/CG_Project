@@ -9,23 +9,29 @@ set(EXTRA_LIBS
         )
 set(OpenGL_GL_PREFERENCE GLVND)
 
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
-include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLEW_INCLUDE_DIRS} )
-
-link_directories(/usr/local/lib/)
 
 
 set(CMAKE_CXX_STANDARD 14)
 
 add_executable(CG_Project
-                main.cpp
-                Shader.h
-                Mesh.h      Mesh.cpp
-                Model.h     Model.cpp
-                Node.h      Node.cpp
-                Terrain.h   Terrain.cpp
-                Camera.h    Camera.cpp)
+        main.cpp
+        stb_image/stb_image.cpp
+        Shader.h
+        Mesh.h      Mesh.cpp
+        Model.h     Model.cpp
+        Node.h      Node.cpp
+        Terrain.h   Terrain.cpp
+        Camera.h    Camera.cpp
+        TextureStore.h TextureStore.cpp)
 
+#target_link_libraries(CG_Project SOIL)
 target_link_libraries(CG_Project ${EXTRA_LIBS})
 target_link_libraries(CG_Project ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+include_directories(soil ${OPENGL_INCLUDE_DIRS}  ${GLEW_INCLUDE_DIRS})
+
+link_directories(/usr/local/lib/)
+
+

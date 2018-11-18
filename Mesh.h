@@ -23,7 +23,7 @@ struct Vertex {
 
 struct Texture {
     unsigned int id;
-    string type;
+//    string type;
 };
 
 class Mesh {
@@ -38,7 +38,7 @@ public:
     glm::mat4 localModel;
 
     /*  Functions  */
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material, Texture text);
     void Draw(glm::mat4 globalModel, Shader shader);
 private:
     /*  Render data  */
