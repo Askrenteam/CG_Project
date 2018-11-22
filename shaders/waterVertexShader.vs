@@ -3,12 +3,14 @@
 in vec3 vertex_position;
 in vec3 vertex_normal;
 in vec2 vertex_texCoords;
+in vec3 vertex_tangent;
 
 
 //out vec3 LightIntensity;
 out vec3 fragPos;
 out vec3 normal;
 out vec2 texCoord;
+out mat3 TBN;
 
 //vec4 LightPosition = vec4 (10.0, 10.0, 4.0, 1.0); // Light position in world coords.
 vec3 Kd = vec3 (1.0, 1.0, 1.0); // white diffuse surface reflectance
@@ -41,6 +43,7 @@ void main(){
 //  // The diffuse shading equation, dot product gives us the cosine of angle between the vectors
 //  LightIntensity = Ld * Kd * max( dot( s, tnorm ), 0.1 );
 //
+  TBN = mat3(vertex_tangent,normalize(cross(vertex_normal,vertex_tangent)),vertex_normal);
   // Convert position to clip coordinates and pass along
   gl_Position = proj * view * model * vec4(vertex_position,1.0);
 }

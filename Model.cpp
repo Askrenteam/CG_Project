@@ -17,7 +17,9 @@ void Model::Draw(Shader shader) {
 
 void Model::loadModel(const string path) {
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene *scene = import.ReadFile(path, aiProcess_Triangulate |
+                                                 aiProcess_GenNormals |
+                                                 aiProcess_CalcTangentSpace);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -70,10 +72,25 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
                 mesh->mNormals[i].y,
                 mesh->mNormals[i].z
                 );
-//        vertex.TexCoords = glm::vec2(
-//                mesh->mTextureCoords[i]->x,
-//                mesh->mTextureCoords[i]->y
-//                );
+        if (mesh->mTextureCoords[0]) {
+            vertex.TexCoords = glm::vec2(
+                    mesh->mTextureCoords[0][i].x,
+                    mesh->mTextureCoords[0][i].y
+            );
+        } else {
+            vertex.TexCoords = glm::vec2(
+                    mesh->mVertices[i].x,
+                    mesh->mVertices[i].y
+            );
+        }
+
+        if (mesh->mTangents) {
+            vertex.Tangent = glm::vec3(
+                    mesh->mTangents[0].x,
+                    mesh->mTangents[0].y,
+                    mesh->mTangents[0].z
+            );
+        }
         vertices.push_back(vertex);
     }
 

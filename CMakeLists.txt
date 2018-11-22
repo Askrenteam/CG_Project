@@ -22,7 +22,7 @@ add_executable(CG_Project
         Node.h      Node.cpp
         Terrain.h   Terrain.cpp
         Camera.h    Camera.cpp
-        TextureStore.h TextureStore.cpp)
+        TextureStore.h TextureStore.cpp Skymap.cpp Skymap.h Light.cpp Light.h)
 
 #target_link_libraries(CG_Project SOIL)
 target_link_libraries(CG_Project ${EXTRA_LIBS})

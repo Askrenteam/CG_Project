@@ -66,6 +66,10 @@ public:
         Use();
         glUniform1f(glGetUniformLocation(this->id, uniformName), uniformValue);
     }
+    void setUniformInt(const GLchar *uniformName, int uniformValue) {
+        Use();
+        glUniform1i(glGetUniformLocation(this->id, uniformName), uniformValue);
+    }
 
 private:
     static void AddShader(GLuint ShaderProgram, const char *pShaderText, GLenum ShaderType)
@@ -125,17 +129,19 @@ private:
             fprintf(stderr, "Error linking shader program: '%s'\n", ErrorLog);
             exit(1);
         }
-
+//        setUniformInt("tex",0);
+//        setUniformInt("normalMap",2);
+//        setUniformInt("skymap",9);
         // program has been successfully linked but needs to be validated to check whether the program can execute given the current pipeline state
-        glValidateProgram(shaderProgramID);
-        // check for program related errors using glGetProgramiv
-        glGetProgramiv(shaderProgramID, GL_VALIDATE_STATUS, &Success);
-        if (!Success)
-        {
-            glGetProgramInfoLog(shaderProgramID, sizeof(ErrorLog), NULL, ErrorLog);
-            fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
-            exit(1);
-        }
+//        glValidateProgram(shaderProgramID);
+//        // check for program related errors using glGetProgramiv
+//        glGetProgramiv(shaderProgramID, GL_VALIDATE_STATUS, &Success);
+//        if (!Success)
+//        {
+//            glGetProgramInfoLog(shaderProgramID, sizeof(ErrorLog), NULL, ErrorLog);
+//            fprintf(stderr, "Invalid shader program: '%s'\n", ErrorLog);
+//            exit(1);
+//        }
         // Finally, use the linked shader program
         // Note: this program will stay in effect for all draw calls until you replace it with another or explicitly disable its use
         glUseProgram(shaderProgramID);

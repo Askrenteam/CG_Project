@@ -8,7 +8,8 @@ using namespace std;
 
 class TextureStore {
 public:
-    GLuint loadTexture (const char* path, string name);
+    GLuint loadTexture (const char* path, string name, int textureUnit);
+    GLuint loadCubeMap (const char* paths[], string name);
     GLuint getTexture (string name);
     static TextureStore *instance ();
 private:

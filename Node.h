@@ -16,6 +16,9 @@ public:
     Node (mat4 model);
 
     void Draw (mat4 globalModel, Shader shader);
+
+    void translate (vec3 translation);
+    void rotate (float degrees, vec3 axis, vec3 rotationPoint);
 };
 
 #endif //CG_LAB4_NODE_H

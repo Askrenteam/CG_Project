@@ -4,9 +4,13 @@
 Terrain::Terrain(int iterations, float alpha, double resSize, double maxHeight)
 {
     this->terrain = Model();
+    this->water = Model();
     this->grass = Model();
     terrain.root->meshes.push_back(generateTerrain(iterations, alpha, resSize,  maxHeight));
-    terrain.root->meshes.push_back(generateWater(resSize,  maxHeight/3));
+    double waterHeight = heightMin + (heightMax-heightMin)/3;
+    water.root->meshes.push_back(generateWater(resSize, waterHeight));
+    water.root->meshes.at(0).textures.push_back({TextureStore::instance()->getTexture("skymap")});
+    this->windmill = addWindmill(waterHeight);
     cout<<"Terrain created"<<endl;
 }
 
@@ -89,11 +93,15 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     unsigned int currVert = 0;
-
+    double resizeFactor = resSize/(float)size;
+    heightMin = DBL_MAX;
+    heightMax = -DBL_MAX;
     for (int x=0; x<size; x++) {
         for (int y=0; y<size; y++) {
+            if (heightMap[x][y] > heightMax) heightMax = heightMap[x][y];
+            if (heightMap[x][y] < heightMin) heightMin = heightMap[x][y];
+
             Vertex vert;
-            double resizeFactor = resSize/(float)size;
             vert.Position = vec3(x*resizeFactor,heightMap[x][y]*resizeFactor,y*resizeFactor);
             plantGrassAt(vec3(vert.Position.x+mRandom(resizeFactor)-resizeFactor/2,
                               vert.Position.y,
@@ -129,29 +137,33 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
             }
             vert.Normal = normalize(n1+n2+n3+n4);
             vert.TexCoords = vec2(x*resizeFactor,y*resizeFactor);
+            vert.Tangent = normalize(cross(vec3(1,0,0),vert.Normal));
             vertices.push_back(vert);
             currVert++;
         }
 //        cout<<endl;
     }
+    heightMax *= resizeFactor;
+    heightMin *= resizeFactor;
     createGrassMesh();
     Texture tex = {TextureStore::instance()->getTexture("grass")};
-    return Mesh(vertices, indices, mat, tex);
+    Texture normalMap = {TextureStore::instance()->getTexture("normalMap")};
+    return Mesh(vertices, indices, mat, tex, normalMap);
 
 }
 
 Mesh Terrain::generateWater(double size, double waterLevel) {
     vector<Vertex> vertices;
     vector<unsigned int> indices;
-    Material mat = {vec3(0.3,0.3,0.7),
-                    vec3(0.1,0.1,0.7),
-                    vec3(0.6,0.6,0.6),
-                    2};
+    Material mat = {vec3(0.3,0.3,0.3),
+                    vec3(0.3,0.3,0.3),
+                    vec3(0.8,0.8,0.8),
+                    32};
 
-    vertices.push_back({vec3(0,waterLevel,0),vec3(0.0,1.0,0.0), vec2(0.0,size)});
-    vertices.push_back({vec3(0,waterLevel,size-1),vec3(0.0,1.0,0.0), vec2(0.0,0.0)});
-    vertices.push_back({vec3(size-1,waterLevel,0),vec3(0.0,1.0,0.0), vec2(size,size)});
-    vertices.push_back({vec3(size-1,waterLevel,size-1),vec3(0.0,1.0,0.0), vec2(size,0.0)});
+    vertices.push_back({vec3(0,waterLevel,0),vec3(0.0,1.0,0.0), vec2(0.0,size),vec3(1,0,0)});
+    vertices.push_back({vec3(0,waterLevel,size-1),vec3(0.0,1.0,0.0), vec2(0.0,0.0),vec3(1,0,0)});
+    vertices.push_back({vec3(size-1,waterLevel,0),vec3(0.0,1.0,0.0), vec2(size,size),vec3(1,0,0)});
+    vertices.push_back({vec3(size-1,waterLevel,size-1),vec3(0.0,1.0,0.0), vec2(size,0.0),vec3(1,0,0)});
     indices.push_back(0);
     indices.push_back(1);
     indices.push_back(2);
@@ -159,8 +171,30 @@ Mesh Terrain::generateWater(double size, double waterLevel) {
     indices.push_back(1);
     indices.push_back(3);
     Texture tex = {TextureStore::instance()->getTexture("water")};
-    return Mesh(vertices, indices, mat, tex);
+    Texture normalMap = {TextureStore::instance()->getTexture("normalMap")};
+    return Mesh(vertices, indices, mat, tex, normalMap);
 }
+
+Model Terrain::addWindmill(double waterHeight) {
+    Model windmill = Model("../res/WMobj.dae");
+    Node *house = windmill.getNode("WindMill");
+    house->meshes.at(0).textures.clear();
+    house->meshes.at(0).textures.push_back({TextureStore::instance()->loadTexture("../res/windmill_diffuse.tga", "windmill",0)});
+    house->meshes.at(0).textures.push_back({TextureStore::instance()->loadTexture("../res/windmill_normal.tga", "windmill_norm",2)});
+    Node *blades = windmill.getNode("Pales");
+    blades->meshes.at(0).textures.clear();
+    blades->meshes.at(0).textures.push_back({TextureStore::instance()->getTexture("windmill")});
+    blades->meshes.at(0).textures.push_back({TextureStore::instance()->getTexture("windmill_norm")});
+
+    vec3 windmillPos = terrain.root->meshes.at(0).vertices.at(mRandom(terrain.root->meshes.at(0).vertices.size())).Position;
+    while (windmillPos.y < waterHeight) {
+        windmillPos = terrain.root->meshes.at(0).vertices.at(mRandom(terrain.root->meshes.at(0).vertices.size())).Position;
+    }
+    windmillPos.y += 6.7;
+    house->translate(windmillPos);
+    return windmill;
+}
+
 
 void Terrain::plantGrassAt(vec3 position) {
     double x = position.x;
@@ -168,11 +202,11 @@ void Terrain::plantGrassAt(vec3 position) {
     double z = position.z;
     unsigned int grassOffset = grassVerts.size();
     double rot = mRandom(2*M_PI); // random rotation of the blade
-    grassVerts.push_back({vec3(x,y,z),vec3(0.0,0.0,1.0),vec2(0.0,0.0)});
-    grassVerts.push_back({vec3(x+0.05*cos(rot),y,z+0.05*sin(rot)),vec3(0.0,0.0,1.0),vec2(1.0,0.0)});
-    grassVerts.push_back({vec3(x+0.05*cos(rot),y+0.5,z+0.05*sin(rot)),vec3(0.0,0.0,1.0),vec2(1.0,0.5)});
-    grassVerts.push_back({vec3(x,y+0.5,z),vec3(0.0,0.0,1.0),vec2(0.0,0.5)});
-    grassVerts.push_back({vec3(x+0.025*cos(rot),y+1.0,z+0.025*cos(rot)),vec3(0.0,0.0,1.0),vec2(0.5,1.0)});
+    grassVerts.push_back({vec3(x,y,z),vec3(0.0,0.0,1.0),vec2(0.0,0.0),vec3(sin(rot),0,cos(rot))});
+    grassVerts.push_back({vec3(x+0.05*cos(rot),y,z+0.05*sin(rot)),vec3(0.0,0.0,1.0),vec2(1.0,0.0),vec3(sin(rot),0,cos(rot))});
+    grassVerts.push_back({vec3(x+0.05*cos(rot),y+0.5,z+0.05*sin(rot)),vec3(0.0,0.0,1.0),vec2(1.0,0.5),vec3(sin(rot),0,cos(rot))});
+    grassVerts.push_back({vec3(x,y+0.5,z),vec3(0.0,0.0,1.0),vec2(0.0,0.5),vec3(sin(rot),0,cos(rot))});
+    grassVerts.push_back({vec3(x+0.025*cos(rot),y+1.0,z+0.025*cos(rot)),vec3(0.0,0.0,1.0),vec2(0.5,1.0),vec3(sin(rot),0,cos(rot))});
     grassIndices.push_back(0+grassOffset);
     grassIndices.push_back(1+grassOffset);
     grassIndices.push_back(2+grassOffset);
@@ -185,16 +219,18 @@ void Terrain::plantGrassAt(vec3 position) {
 }
 
 void Terrain::createGrassMesh() {
-    Material mat = {vec3(0.3,0.5,0.3),
+    Material mat = {vec3(0.2,0.2,0.2),
                     vec3(0.8,0.8,0.8),
                     vec3(0.6,0.6,0.6),
                     2};
     Texture tex = {TextureStore::instance()->getTexture("blade")};
-    grass.root->meshes.push_back(Mesh(grassVerts,grassIndices,mat,tex));
+    Texture normalMap = {TextureStore::instance()->getTexture("normalMap")};
+    grass.root->meshes.push_back(Mesh(grassVerts,grassIndices,mat,tex, normalMap));
 }
-void Terrain::Draw(Shader shader) {
-//    shader.setUniformMat4("proj", perspective(45.0f, (float)800 / (float)600, 0.1f, 1000.0f));
+void Terrain::Draw(Shader shader, Shader waterShader) {
     terrain.Draw(shader);
-//    shader.setUniformMat4("proj", perspective(45.0f, (float)800 / (float)600, 0.1f, 1.0f));
     grass.Draw(shader);
+    water.Draw(waterShader);
+    windmill.Draw(shader);
 }
+

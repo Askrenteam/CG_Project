@@ -19,6 +19,7 @@ struct Vertex {
     glm::vec3 Position;
     glm::vec3 Normal;
     glm::vec2 TexCoords;
+    glm::vec3 Tangent;
 };
 
 struct Texture {
@@ -39,8 +40,11 @@ public:
 
     /*  Functions  */
     Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material, Texture text);
+    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, Material material, Texture text, Texture normalMap);
+
+    Mesh() {};
     void Draw(glm::mat4 globalModel, Shader shader);
-private:
+protected:
     /*  Render data  */
     unsigned int VAO, VBO, EBO;
     /*  Functions    */
