@@ -59,8 +59,10 @@ void Mesh::Draw(glm::mat4 globalModel, Shader shader) {
     glBindVertexArray(VAO);
     shader.setUniformInt("tex",textures.at(0).id);
     glBindTexture(GL_TEXTURE_2D, textures.at(0).id);
-    shader.setUniformInt("normalMap",textures.at(1).id);
-    glBindTexture(GL_TEXTURE_2D, textures.at(1).id);
+    if (textures.size() > 1) {
+        shader.setUniformInt("normalMap",textures.at(1).id);
+        glBindTexture(GL_TEXTURE_2D, textures.at(1).id);
+    }
     if (textures.size() > 2) {
         shader.setUniformInt("skymap",9);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textures.at(2).id);

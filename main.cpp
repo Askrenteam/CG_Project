@@ -23,6 +23,7 @@
 #include "Camera.h"
 #include "TextureStore.h"
 #include "Skymap.h"
+#include "Light.h"
 
 
 
@@ -41,12 +42,16 @@ using namespace glm;
 Shader *shader;
 Shader *skymapShader;
 Shader *waterShader;
+Shader *lightShader;
 vec3 lightPos;
 
 Camera *cam;
 
 Terrain *terr;
 Skymap *sky;
+Light *sun;
+Light *pointLight;
+Light *pointLight2;
 
 Model *windmill;
 Node *blades;
@@ -70,7 +75,6 @@ void display() {
 	glUseProgram(shader->id);
 
 
-	// Root of the Hierarchy
     mat4 persp_proj = perspective(45.0f, (float)width / (float)height, 0.1f, 1000.0f);
 //    mat4 persp_proj = ortho((float)-width/40,(float)width/40,(float)-height/40,(float)height/40,0.1f,100.0f);
 
@@ -80,14 +84,18 @@ void display() {
 	// update uniforms & draw
     shader->setUniformMat4("proj", persp_proj);
     shader->setUniformMat4("view", cam->view);
-    shader->setUniformVec3("light.position", lightPos);
+//    shader->setUniformVec3("light.direction", sun->direction);
+//    shader->setUniformVec3("pLight.position", pointLight->position);
     shader->setUniformVec3("eye_pos", cam->cameraPos);
     waterShader->setUniformMat4("proj", persp_proj);
     waterShader->setUniformMat4("view", cam->view);
-    waterShader->setUniformVec3("light.position", lightPos);
+//    waterShader->setUniformVec3("light.direction", sun->direction);
+//    waterShader->setUniformVec3("pLight.position", pointLight->position);
     waterShader->setUniformVec3("eye_pos", cam->cameraPos);
 //    model_data->Draw(*shader);
     terr->Draw(*shader, *waterShader);
+    pointLight->Draw(*lightShader);
+    pointLight2->Draw(*lightShader);
 //    windmill->Draw(*shader);
 
 	glutSwapBuffers();
@@ -104,7 +112,7 @@ void updateScene() {
 	last_time = curr_time;
 
 	// Rotate the light around the model
-	lightPos = vec3 (100+200*sin(curr_time/5000), 100+200*cos(curr_time/5000), 0.0);
+//	lightPos = vec3 (100+200*sin(curr_time/5000), 100+200*cos(curr_time/5000), 0.0);
 
     // Rotate the windmill's blades
     blades->rotate(1.0f, vec3(0.0,0.0,1.0), vec3(0.205,875,0.0));
@@ -134,22 +142,33 @@ void init()
 
     sky = new Skymap(faces);
 
+    sun = new Light(DIRECTIONAL, vec3(0,0,0), vec3(1,-0.5,0), vec3(0.3), vec3(0.8), vec3(0.6));
+//    pointLight = new Light(POINT, vec3(100,40,100),vec3(0,0,0),vec3(0.3,0.0,0.0),vec3(0.8,0.5,0.5),vec3(0.5,0.1,0.1),
+//                        1.0,0.022,0.0020);
+//    pointLight2 = new Light(POINT, vec3(100,40,50),vec3(0,0,0),vec3(0.0,0.0,1.0),vec3(0.8,0.5,0.8),vec3(0.1,0.1,0.6),
+//                        1.0,0.022,0.0020);
+    pointLight = new Light(POINT, vec3(100,40000,100),vec3(0,0,0),vec3(0.3,0.0,0.0),vec3(0.8,0.5,0.5),vec3(0.5,0.1,0.1),
+                        1.0,0.022,0.0020);
+    pointLight2 = new Light(POINT, vec3(100,40000,50),vec3(0,0,0),vec3(0.0,0.0,1.0),vec3(0.8,0.5,0.8),vec3(0.1,0.1,0.6),
+                        1.0,0.022,0.0020);
+
 	waterShader = new Shader("../shaders/waterVertexShader.vs","../shaders/waterFragmentShader.frag");
+    lightShader = new Shader("../shaders/lightVertexShader.vs","../shaders/lightFragmentShader.frag");
 
 
     terr = new Terrain(8,30.0,200,100.0);
+//    terr = new Terrain(8,50.0,200,200.0);
 //	terr = new Terrain(1,2,20.0,5.0);
     blades = terr->windmill.getNode("Pales");
     cam = new Camera(vec3(1,0,0),vec3(-1.0,0.0,0.0),vec3(0.0,0.0,0.0),0.5f,0.25f);
 
-    lightPos = vec3 (100.0, 300.0, 0.0);
-//    lightPos = vec3 (10.0, 10.0, 10.0);
-    shader->setUniformVec3("light.ambient", vec3(0.3));
-    shader->setUniformVec3("light.diffuse", vec3(1.0));
-    shader->setUniformVec3("light.specular", vec3(0.6));
-    waterShader->setUniformVec3("light.ambient", vec3(0.3));
-    waterShader->setUniformVec3("light.diffuse", vec3(1.0));
-    waterShader->setUniformVec3("light.specular", vec3(0.6));
+    sun->setDirLight(shader);
+    sun->setDirLight(waterShader);
+    pointLight->setPointLight(shader,0);
+    pointLight->setPointLight(waterShader,0);
+    pointLight2->setPointLight(shader,1);
+    pointLight2->setPointLight(waterShader,1);
+
 }
 
 void mousemove(int x, int y) {

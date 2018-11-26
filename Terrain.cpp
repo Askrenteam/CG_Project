@@ -7,7 +7,7 @@ Terrain::Terrain(int iterations, float alpha, double resSize, double maxHeight)
     this->water = Model();
     this->grass = Model();
     terrain.root->meshes.push_back(generateTerrain(iterations, alpha, resSize,  maxHeight));
-    double waterHeight = heightMin + (heightMax-heightMin)/3;
+    double waterHeight = heightMin + (heightMax-heightMin)/2;
     water.root->meshes.push_back(generateWater(resSize, waterHeight));
     water.root->meshes.at(0).textures.push_back({TextureStore::instance()->getTexture("skymap")});
     this->windmill = addWindmill(waterHeight);
@@ -88,7 +88,7 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
 
     Material mat = {vec3(0.3,0.3,0.3),
                     vec3(0.8,0.8,0.8),
-                    vec3(0.0,0.0,0.0),
+                    vec3(0.1,0.1,0.1),
                     2};
     vector<Vertex> vertices;
     vector<unsigned int> indices;
@@ -103,6 +103,9 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
 
             Vertex vert;
             vert.Position = vec3(x*resizeFactor,heightMap[x][y]*resizeFactor,y*resizeFactor);
+            plantGrassAt(vec3(vert.Position.x+mRandom(resizeFactor)-resizeFactor/2,
+                              vert.Position.y,
+                              vert.Position.z+mRandom(resizeFactor)-resizeFactor/2));
             plantGrassAt(vec3(vert.Position.x+mRandom(resizeFactor)-resizeFactor/2,
                               vert.Position.y,
                               vert.Position.z+mRandom(resizeFactor)-resizeFactor/2));
@@ -231,6 +234,6 @@ void Terrain::Draw(Shader shader, Shader waterShader) {
     terrain.Draw(shader);
     grass.Draw(shader);
     water.Draw(waterShader);
-    windmill.Draw(shader);
+//    windmill.Draw(shader);
 }
 
