@@ -38,6 +38,7 @@ class Light {
     void setDirLight (Shader *shader);
     void setPointLight (Shader *shader, int index);
     void Draw (Shader shader);
+    void move (vec3 movement);
 };
 
 

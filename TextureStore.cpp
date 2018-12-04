@@ -46,7 +46,6 @@ GLuint TextureStore::loadCubeMap(const char *paths[], string name) {
         if (data)
         {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-//            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         }
         else
         {
@@ -74,10 +73,6 @@ TextureStore *TextureStore::store_instance = 0;
 TextureStore *TextureStore::instance() {
     if (!store_instance) {
         store_instance = new TextureStore();
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         stbi_set_flip_vertically_on_load(true);
     }
     return store_instance;

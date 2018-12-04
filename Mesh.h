@@ -24,7 +24,6 @@ struct Vertex {
 
 struct Texture {
     unsigned int id;
-//    string type;
 };
 
 class Mesh {
@@ -35,7 +34,6 @@ public:
     vector<unsigned int> indices;
     vector<Texture> textures;
     Material material;
-//    MNode *node;
     glm::mat4 localModel;
 
     /*  Functions  */
@@ -49,7 +47,6 @@ protected:
     unsigned int VAO, VBO, EBO;
     /*  Functions    */
     void setupMesh();
-    void setupMaterial();
 };
 
 #endif //CG_LAB3_MESH_H

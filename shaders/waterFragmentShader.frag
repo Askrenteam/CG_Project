@@ -58,7 +58,7 @@ void main(){
     }
 
 
-	gl_FragColor = mix(texture(skymap,R),texture(tex,texCoord)*vec4 (lightResult, 1.0),0.4);
+	gl_FragColor = mix(texture(skymap,R),texture(tex,texCoord)*vec4 (lightResult, 1.0),0.7);
 }
 
 vec3 calcDirLight(DirLight l) {

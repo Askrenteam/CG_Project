@@ -32,8 +32,7 @@ void Model::loadModel(const string path) {
 }
 
 void Model::processNode(aiNode *node, const aiScene *scene, Node *currNode) {
-    // process all the node's meshes (if any)
-//    cout<<node->mName.C_Str()<<endl;
+    // process all the node's meshes
     currNode->name = node->mName.C_Str();
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {

@@ -23,6 +23,8 @@ Light::Light(lightType type, vec3 pos, vec3 dir, vec3 ambient, vec3 diffuse, vec
     this->quadratic = quadratic;
 
     this->sphere = new Model("../res/sphere.dae");
+    this->sphere->root->translate(position);
+
 }
 
 void Light::setDirLight(Shader *shader) {
@@ -48,4 +50,9 @@ void Light::setPointLight(Shader *shader, int index) {
 void Light::Draw(Shader shader) {
     shader.setUniformVec3("lightColor", this->diffuse);
     this->sphere->Draw(shader);
+}
+
+void Light::move(vec3 movement) {
+    this->position = position + movement;
+    this->sphere->root->translate(movement);
 }

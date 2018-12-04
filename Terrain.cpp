@@ -36,7 +36,7 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
     for (int i=0; i<n; i++) {
         // Diamond
         int step = (int)((size-1)/pow(2,i+1));
-//        cout<<"step : "<<step<<endl;
+
         for (int x=step; x <size-1; x+=2*step) {
             for ( int y=step; y <size-1; y+=2*step) {
                 heightMap[x][y] = ((mRandom(2*alpha))-alpha+
@@ -109,7 +109,7 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
             plantGrassAt(vec3(vert.Position.x+mRandom(resizeFactor)-resizeFactor/2,
                               vert.Position.y,
                               vert.Position.z+mRandom(resizeFactor)-resizeFactor/2));
-//            cout << vert.Position.x<<" "<<vert.Position.y<<" "<<vert.Position.z<<" "<<endl;
+
             vec3 n1 = vec3(0,0,0);
             vec3 n2 = vec3(0,0,0);
             vec3 n3 = vec3(0,0,0);
@@ -144,7 +144,6 @@ Mesh Terrain::generateTerrain(int n, double alpha, double resSize, double maxHei
             vertices.push_back(vert);
             currVert++;
         }
-//        cout<<endl;
     }
     heightMax *= resizeFactor;
     heightMin *= resizeFactor;
@@ -160,7 +159,7 @@ Mesh Terrain::generateWater(double size, double waterLevel) {
     vector<unsigned int> indices;
     Material mat = {vec3(0.3,0.3,0.3),
                     vec3(0.3,0.3,0.3),
-                    vec3(0.8,0.8,0.8),
+                    vec3(0.9,0.9,0.9),
                     32};
 
     vertices.push_back({vec3(0,waterLevel,0),vec3(0.0,1.0,0.0), vec2(0.0,size),vec3(1,0,0)});
@@ -234,6 +233,6 @@ void Terrain::Draw(Shader shader, Shader waterShader) {
     terrain.Draw(shader);
     grass.Draw(shader);
     water.Draw(waterShader);
-//    windmill.Draw(shader);
+    windmill.Draw(shader);
 }
 
